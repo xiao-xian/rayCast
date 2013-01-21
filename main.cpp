@@ -89,10 +89,11 @@ void main( void )                                                           \n\
         alpha_acc += alpha_sample;                                          \n\
         vect += delta_dir;                                                  \n\
         length_acc += delta_dir_len;                                        \n\
-        if( length_acc >= len || alpha_acc > 1.0 )                          \n\
+        if( length_acc > len || alpha_acc > 1.0 )                          \n\
             break;                                                          \n\
     }                                                                       \n\
     gl_FragColor =  col_acc;                                                \n\
+                                                                            \n\
 }";
 
 //--------------------------------------------------------------------------------------
@@ -276,60 +277,70 @@ void create_volumetexture()
 {
 	int size = VOLUME_TEX_SIZE*VOLUME_TEX_SIZE*VOLUME_TEX_SIZE* 4;
 	GLubyte *data = new GLubyte[size];
+    
+    const int UPPER = VOLUME_TEX_SIZE *2 - 6;
 
 	for(int x = 0; x < VOLUME_TEX_SIZE; x++)
-	{for(int y = 0; y < VOLUME_TEX_SIZE; y++)
-	{for(int z = 0; z < VOLUME_TEX_SIZE; z++)
 	{
-		data[(x*4)   + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = z%250;
-		data[(x*4)+1 + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = y%250;
-		data[(x*4)+2 + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 250;
-		data[(x*4)+3 + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 230;
-	  	
-		Vector3 p =	Vector3(x,y,z)- Vector3(VOLUME_TEX_SIZE-20,VOLUME_TEX_SIZE-30,VOLUME_TEX_SIZE-30);
-		bool test = (p.length() < 42);
-		if(test)
-			data[(x*4)+3 + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 0;
+        for(int y = 0; y < VOLUME_TEX_SIZE; y++)
+        {
+            for(int z = 0; z < VOLUME_TEX_SIZE; z++)
+            {
+                int r = (x*4)   + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4);
+                int g = r+1;
+                int b = g+1;
+                int a = b+1;
+                
+                data[ r ] = z; //z%UPPER;
+                data[ g ] = y; // y%UPPER;
+                data[ b ] = UPPER;
+                data[ a ] = UPPER-20;
+                
+                Vector3 p =	Vector3(x,y,z)- Vector3(VOLUME_TEX_SIZE-20,VOLUME_TEX_SIZE-30,VOLUME_TEX_SIZE-30);
+                
+                bool test = (p.length() < 42);
+                if(test)
+                {
+                    data[ a ] = 0;
+                }
 
-		p =	Vector3(x,y,z)- Vector3(VOLUME_TEX_SIZE/2,VOLUME_TEX_SIZE/2,VOLUME_TEX_SIZE/2);
-		test = (p.length() < 24);
-		if(test)
-			data[(x*4)+3 + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 0;
+                p =	Vector3(x,y,z)- Vector3(VOLUME_TEX_SIZE/2,VOLUME_TEX_SIZE/2,VOLUME_TEX_SIZE/2);
+                test = (p.length() < 24);
+                if(test)
+                    data[ a ] = 0;
 
-		
-		if(x > 20 && x < 40 && y > 0 && y < VOLUME_TEX_SIZE && z > 10 &&  z < 50)
-		{
-			
-			data[(x*4)   + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 100;
-		    data[(x*4)+1 + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 250;
-		    data[(x*4)+2 + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = y%100;
-			data[(x*4)+3 + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 250;
-		}
+                
+                if(x > 20 && x < 40 && y > 0 && y < VOLUME_TEX_SIZE && z > 10 &&  z < 50)
+                {
+                    data[ r ] = UPPER/2;
+                    data[ g ] = UPPER;
+                    data[ b ] = y%(UPPER/2);
+                    data[ a ] = UPPER;
+                }
 
-		if(x > 50 && x < 70 && y > 0 && y < VOLUME_TEX_SIZE && z > 10 &&  z < 50)
-		{
-			
-			data[(x*4)   + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 250;
-		    data[(x*4)+1 + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 250;
-		    data[(x*4)+2 + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = y%100;
-			data[(x*4)+3 + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 250; 
-		}
+                if(x > 50 && x < 70 && y > 0 && y < VOLUME_TEX_SIZE && z > 10 &&  z < 50)
+                {
+                    data[ r ] = UPPER;
+                    data[ g ] = UPPER;
+                    data[ b ] = y%(UPPER/2);
+                    data[ a ] = UPPER; 
+                }
 
-		if(x > 80 && x < 100 && y > 0 && y < VOLUME_TEX_SIZE && z > 10 &&  z < 50)
-		{
-			
-			data[(x*4)   + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 250;
-		    data[(x*4)+1 + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 70;
-		    data[(x*4)+2 + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = y%100;
-			data[(x*4)+3 + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 250;
-		}
+                if(x > 80 && x < 100 && y > 0 && y < VOLUME_TEX_SIZE && z > 10 &&  z < 50)
+                {
+                    data[ r ] = UPPER;
+                    data[ g ] = UPPER/3;
+                    data[ b ] = y%(UPPER/2);
+                    data[ a ] = UPPER;
+                }
 
-		p =	Vector3(x,y,z)- Vector3(24,24,24);
-		test = (p.length() < 40);
-		if(test)
-			data[(x*4)+3 + (y * VOLUME_TEX_SIZE * 4) + (z * VOLUME_TEX_SIZE * VOLUME_TEX_SIZE * 4)] = 0;
-			
-	}}}
+                p =	Vector3(x,y,z)- Vector3(24,24,24);
+                test = (p.length() < 40);
+                if(test)
+                    data[ a ] = 0;
+            }
+        }
+    }
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT,1);
 	glGenTextures(1, &volume_texture);
@@ -340,8 +351,9 @@ void create_volumetexture()
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
-	glTexImage3D(GL_TEXTURE_3D, 0,GL_RGBA, VOLUME_TEX_SIZE, VOLUME_TEX_SIZE,VOLUME_TEX_SIZE,0, GL_RGBA, GL_UNSIGNED_BYTE,data);
-
+	
+    glTexImage3D(GL_TEXTURE_3D, 0,GL_RGBA, VOLUME_TEX_SIZE, VOLUME_TEX_SIZE,VOLUME_TEX_SIZE,0, GL_RGBA, GL_UNSIGNED_BYTE,data);
+    
 	delete []data;
 	cout << "volume texture created" << endl;
 
@@ -559,7 +571,7 @@ void raycasting_pass()
 {
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, final_image, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	
+    
     // set step size: 
     glUseProgram( g_shaderProgram );
     //glBindParameterEXT( g_shaderProgram );
