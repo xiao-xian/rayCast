@@ -62,7 +62,7 @@ varying vec4 model_view;                                                    \n\
                                                                             \n\
 void main( void )                                                           \n\
 {                                                                           \n\
-    vec2 texc = ( model_view.xy / model_view.z + 1.0 ) / 2.0 ;              \n\
+    vec2 texc = ( model_view.xy / model_view.w + 1.0 ) / 2.0 ;              \n\
     vec4 start = gl_TexCoord[0];                                            \n\
     vec4 back_position = texture2D( tex, texc );                            \n\
     vec3 dir = vec3( 0.0 );                                                 \n\
